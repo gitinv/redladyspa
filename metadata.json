@@ -1,0 +1,6 @@
+{
+  "name": "The Red Lady Spa",
+  "description": "A comprehensive full-stack booking, client portal, and owner POS management system for nail spas.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

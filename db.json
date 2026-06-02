@@ -1,0 +1,311 @@
+{
+  "products": [
+    {
+      "id": "prod-1",
+      "name": "Aurora Velvet Chrome Polish",
+      "category": "Polish",
+      "price": 18,
+      "description": "Infused with ultra-fine magnetic pigment that shifts colors with a luxury magnetic wand.",
+      "image": "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400&q=80",
+      "stock": 45,
+      "lowStockAlert": 10
+    },
+    {
+      "id": "prod-2",
+      "name": "Japanese Pastels Soft-gel Set",
+      category: "Art",
+      "price": 24.5,
+      "description": "Premium self-leveling pastel gel polishes with high opacity, used by our master trainers.",
+      "image": "https://images.unsplash.com/photo-1632345031435-8797b2d58045?w=400&q=80",
+      "stock": 8,
+      "lowStockAlert": 12
+    },
+    {
+      "id": "prod-3",
+      "name": "Organic Shea Butter Hand Mask",
+      "category": "Care",
+      "price": 15,
+      "description": "Ultra-hydrating paraben-free mask designed to restore elasticity and natural moisture.",
+      "image": "https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?w=400&q=80",
+      "stock": 30,
+      "lowStockAlert": 8
+    },
+    {
+      "id": "prod-4",
+      "name": "Japanese Precision Glass File",
+      "category": "Tools",
+      "price": 12,
+      "description": "Micro-etched glass file that seals the keratin edge of nails to prevent peeling and splitting.",
+      "image": "https://images.unsplash.com/photo-1500840244009-7e3c8a69a4c8?w=400&q=80",
+      "stock": 14,
+      "lowStockAlert": 5
+    },
+    {
+      "id": "prod-5",
+      "name": "Midnight Eclipse Caviar Charms",
+      "category": "Art",
+      "price": 9,
+      "description": "Microscopic dark metallic caviar beads for gorgeous starlight galaxy-themed 3D nail art.",
+      "image": "https://images.unsplash.com/photo-1595853035070-59a39fe84de3?w=400&q=80",
+      "stock": 3,
+      "lowStockAlert": 10
+    },
+    {
+      "id": "prod-6",
+      "name": "Vitamin E Nourishing Cuticle Oil",
+      "category": "Care",
+      "price": 10.5,
+      "description": "Cold-pressed almond and jojoba base with pure tocopherol for strong nail roots.",
+      "image": "https://images.unsplash.com/photo-1617897903246-719242758050?w=400&q=80",
+      "stock": 50,
+      "lowStockAlert": 15
+    }
+  ],
+  "technicians": [
+    {
+      "id": "tech-1",
+      "name": "Chloe Kim",
+      "role": "Nail Art Queen",
+      "avatar": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&q=80",
+      "rating": 4.9,
+      "specialties": [
+        "3D Gel Art",
+        "Hand-painted Lineage",
+        "Cat-eye Shifts"
+      ],
+      "availability": [
+        "09:00 AM",
+        "10:00 AM",
+        "11:00 AM",
+        "01:00 PM",
+        "02:00 PM",
+        "03:00 PM",
+        "04:00 PM"
+      ]
+    },
+    {
+      "id": "tech-2",
+      "name": "Sophia Martinez",
+      "role": "Sculpting master",
+      "avatar": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&q=80",
+      "rating": 4.8,
+      "specialties": [
+        "Structure Gel Extensions",
+        "Acrylic Extensions",
+        "Russian Manicure"
+      ],
+      "availability": [
+        "10:00 AM",
+        "11:00 AM",
+        "01:00 PM",
+        "02:00 PM",
+        "03:00 PM",
+        "04:00 PM",
+        "05:00 PM"
+      ]
+    },
+    {
+      "id": "tech-3",
+      "name": "Marcus Chen",
+      "role": "Precision Minimalist",
+      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&q=80",
+      "rating": 4.9,
+      "specialties": [
+        "Minimalist Linework",
+        "Matte Overlay",
+        "Chrome Accents"
+      ],
+      "availability": [
+        "09:00 AM",
+        "11:00 AM",
+        "01:00 PM",
+        "03:00 PM",
+        "04:00 PM",
+        "05:00 PM"
+      ]
+    },
+    {
+      "id": "tech-4",
+      "name": "Yuki Tanaka",
+      "role": "Japanese Artistry Specialist",
+      "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&q=80",
+      "rating": 5,
+      "specialties": [
+        "Enamel Pastels",
+        "3D Jelly Flowers",
+        "Foil Overlay"
+      ],
+      "availability": [
+        "09:00 AM",
+        "10:00 AM",
+        "11:00 AM",
+        "01:00 PM",
+        "02:00 PM",
+        "03:00 PM",
+        "04:00 PM",
+        "05:00 PM"
+      ]
+    }
+  ],
+  "appointments": [
+    {
+      "id": "app-1",
+      "clientName": "Eleanor Vance",
+      "clientPhone": "555-0144",
+      "clientEmail": "eleanor@example.com",
+      "serviceName": "Aurora Velvet Cat-eye Shellac",
+      "technicianId": "tech-1",
+      "technicianName": "Chloe Kim",
+      "date": "2026-06-03",
+      "time": "10:00 AM",
+      "status": "Confirmed",
+      "price": 85,
+      "paymentStatus": "Unpaid",
+      "createdAt": "2026-05-30T10:00:00Z"
+    },
+    {
+      "id": "app-2",
+      "clientName": "Gemma Ward",
+      "clientPhone": "415-555-0199",
+      "clientEmail": "gemma.ward@example.com",
+      "serviceName": "Builder Gel Overlay & Minimalist Matte",
+      "technicianId": "tech-3",
+      "technicianName": "Marcus Chen",
+      "date": "2026-06-04",
+      "time": "01:00 PM",
+      "status": "Confirmed",
+      "price": 95,
+      "paymentStatus": "Unpaid",
+      "createdAt": "2026-05-31T14:20:00Z"
+    },
+    {
+      "id": "app-3",
+      "clientName": "Sasha Grey",
+      "clientPhone": "555-0122",
+      "clientEmail": "sasha@example.com",
+      "serviceName": "Midnight Velvet Spark Package",
+      "technicianId": "tech-4",
+      "technicianName": "Yuki Tanaka",
+      "date": "2026-06-01",
+      "time": "11:00 AM",
+      "status": "Completed",
+      "price": 145,
+      "paymentStatus": "Paid",
+      "createdAt": "2026-05-31T09:00:00Z"
+    }
+  ],
+  "trends": [
+    {
+      "id": "trend-1",
+      "title": "Magnetic Velvet Cat-Eye",
+      "description": "Dual-layer shifting magnetic pigments creating an ultra-lush, dimensional depth in rich emerald or deep rose quartz.",
+      "image": "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=600&q=80",
+      "rank": 1,
+      "hearts": 342
+    },
+    {
+      "id": "trend-2",
+      "title": "Aurora Glass Chrome",
+      "description": "Mirrored, futuristic pearlescent powder buffed onto a clean neutral base to mimic floating Northern lights.",
+      "image": "https://images.unsplash.com/photo-1632345031435-8797b2d58045?w=600&q=80",
+      "rank": 2,
+      "hearts": 289
+    },
+    {
+      "id": "trend-3",
+      "title": "3D Jelly Flowers",
+      "description": "Translucent raised sculptural petals structured in Japanese builder gel with blush color droplets underneath.",
+      "image": "https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=600&q=80",
+      "rank": 3,
+      "hearts": 201
+    },
+    {
+      "id": "trend-4",
+      "title": "Liquid Amber Tortoiseshell",
+      "description": "Multiple layered washes of sepia, rust, and molasses gold to obtain a realistic, gorgeous polished amber glaze.",
+      "image": "https://images.unsplash.com/photo-1607779097040-26e80aa78e66?w=600&q=80",
+      "rank": 4,
+      "hearts": 175
+    },
+    {
+      "id": "trend-5",
+      "title": "Lilac Aura Blush",
+      "description": "Soft airbrushed neon core that melts elegantly into pastel lavender edges for a dreamy celestial halo look.",
+      "image": "https://images.unsplash.com/photo-1617897903246-719242758050?w=600&q=80",
+      "rank": 5,
+      "hearts": 148
+    }
+  ],
+  "creatorMonth": {
+    "influencerName": "Aria Thorne (@aria_nails)",
+    "avatar": "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=120&q=80",
+    "packageName": "Midnight Velvet Spark",
+    "packageDescription": "Created exclusively by digital artist Aria Thorne, this customized package merges the mesmerizing Aurora Velvet gel, starlight crystals, and a restoring wildrose paraffin hydration bath.",
+    "packagePrice": 145,
+    "itemsIncluded": [
+      "Signature Hard Gel Strengthening Base",
+      "Duochrome Velvet Shifting Polish (All fingers)",
+      "6x Artisan Hand-Placed Charcoal Diamonds",
+      "Hydrating Organic Cuticle Therapy",
+      "Luxe Wildrose Warm Paraffin Care"
+    ],
+    "image": "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=800&q=80"
+  },
+  "clients": [
+    {
+      "id": "client-1",
+      "name": "Eleanor Vance",
+      "phone": "555-0144",
+      "email": "eleanor@example.com",
+      "notes": "Prefers round tips. Loves dark green themes.",
+      "visitsCount": 12,
+      "totalSpend": 780,
+      "createdAt": "2025-08-12T14:00:00Z"
+    },
+    {
+      "id": "client-2",
+      "name": "Gemma Ward",
+      "phone": "415-555-0199",
+      "email": "gemma.ward@example.com",
+      "notes": "Has delicate cuticles. Strict preference for Japanese gels.",
+      "visitsCount": 4,
+      "totalSpend": 310,
+      "createdAt": "2026-02-19T10:15:00Z"
+    },
+    {
+      "id": "client-3",
+      "name": "Sasha Grey",
+      "phone": "555-0122",
+      "email": "sasha@example.com",
+      "notes": "Creator of beauty vlogs. Extremely supportive on Instagram.",
+      "visitsCount": 8,
+      "totalSpend": 920,
+      "createdAt": "2025-11-05T12:00:00Z"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "tx-1",
+      "appointmentId": "app-3",
+      "clientName": "Sasha Grey",
+      "date": "2026-06-01",
+      "amount": 145,
+      "items": [
+        "Midnight Velvet Spark Package"
+      ],
+      "paymentMethod": "Card",
+      "technicianName": "Yuki Tanaka"
+    },
+    {
+      "id": "tx-2",
+      "clientName": "Walk-in Guest",
+      "date": "2026-05-31",
+      "amount": 45,
+      "items": [
+        "Vitamin E Nourishing Cuticle Oil x2",
+        "Precision Glass File x2"
+      ],
+      "paymentMethod": "Tap"
+    }
+  ]
+}
