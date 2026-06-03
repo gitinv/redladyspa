@@ -20,7 +20,27 @@ interface ClientPortalProps {
 export default function ClientPortal({ onRefreshPOSData }: ClientPortalProps) {
   // Device Preview State
   // "iphone" | "android" | "tablet" | "web"
-  const [viewport, setViewport] = useState<"iphone" | "android" | "tablet" | "web">("web");
+  const [viewport, setViewport] = useState<"iphone" | "android" | "tablet" | "web">(() => {
+    if (typeof window !== "undefined" && typeof navigator !== "undefined") {
+      const ua = navigator.userAgent.toLowerCase();
+      const isTablet = /ipad|tablet|(android(?!.*mobile))|playbook|silk/i.test(ua);
+      const isMobile = /mobile|iphone|ipod|android|blackberry|opera mini|iemobile/i.test(ua);
+      
+      if (isTablet) {
+        return "tablet";
+      }
+      if (isMobile) {
+        if (/iphone|ipod/.test(ua)) {
+          return "iphone";
+        }
+        if (/android/.test(ua)) {
+          return "android";
+        }
+        return "iphone"; // default mobile fallback
+      }
+    }
+    return "web";
+  });
 
   // Client session persistence
   const [currentUser, setCurrentUser] = useState<{ name: string; phone: string; email: string } | null>(() => {
