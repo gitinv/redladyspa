@@ -170,7 +170,7 @@ export default function ClientPortal({ onRefreshPOSData }: ClientPortalProps) {
     { category: "Add Aura", name: "Gel Polish Professional Removal", price: 10.00, duration: "15 mins", desc: "Gentle acetone foil soak-off protecting natural keratin plates from scratching." },
     
     // Compatibility: Creator Customized Pack
-    { category: "Add Aura", name: "Creator Customized Pack: Midnight Velvet Spark", price: 145.00, duration: "100 mins", desc: "Designed by Aria Thorne. Shifting velvet polish, custom crystals, hot stone, and paraffin treatment." }
+    { category: "Nails Bar", name: "Creator Customized Pack: Midnight Velvet Spark", price: 145.00, duration: "100 mins", desc: "Designed by Aria Thorne. Shifting velvet polish, custom crystals, hot stone, and paraffin treatment." }
   ];
 
   // Sync category tabs when services are selected
@@ -2008,7 +2008,19 @@ export default function ClientPortal({ onRefreshPOSData }: ClientPortalProps) {
                       <button
                         onClick={() => {
                           const matchingService = services.find(s => s.name.includes("Creator Customized"));
-                          setSelectedService(matchingService || { name: `Creator Customized Pack: ${creatorPackage.packageName}`, price: creatorPackage.packagePrice });
+                          if (matchingService) {
+                            setSelectedServices([matchingService]);
+                          } else {
+                            setSelectedServices([{
+                              category: "Nails Bar",
+                              name: `Creator Customized Pack: ${creatorPackage?.packageName || "Midnight Velvet Spark"}`,
+                              price: creatorPackage?.packagePrice || 145.00,
+                              duration: "100 mins",
+                              desc: creatorPackage?.packageDescription || ""
+                            }]);
+                          }
+                          setWizardCategory("Nails Bar");
+                          setActiveServiceCategory("Nails Bar");
                           setActiveTab("book");
                         }}
                         className="bg-[#1A1A1A] hover:bg-stone-850 text-white font-semibold px-6 py-3 rounded-full text-[10px] uppercase tracking-widest transition flex items-center gap-1.5 cursor-pointer select-none"
