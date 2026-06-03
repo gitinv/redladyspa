@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
 import { Product, Technician, Appointment, Trend, CreatorMonth, ClientProfile } from "../types.js";
 import { fetchProducts, fetchTechnicians, bookAppointment, patchAppointment, fetchTrends, voteTrend, fetchCreatorMonth, fetchClients } from "../services/api.js";
 import { Sparkles, Calendar, User, Phone, Mail, FileText, CheckCircle, Heart, Star, ShoppingBag, ArrowRight, Layers, PhoneCall, Smartphone, Home, LogIn, LogOut, Check, ChevronRight, ChevronLeft, Bell, Award, Tag, Settings, Eye, Info } from "lucide-react";
@@ -55,6 +56,7 @@ export default function ClientPortal({ onRefreshPOSData }: ClientPortalProps) {
   const [creatorPackage, setCreatorPackage] = useState<CreatorMonth | null>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [clients, setClients] = useState<ClientProfile[]>([]);
+  const [monthlyContent, setMonthlyContent] = useState<any>(null);
 
   // Push Notifications, Loyalty & Voucher states
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -267,6 +269,13 @@ export default function ClientPortal({ onRefreshPOSData }: ClientPortalProps) {
       setTrends(trendsData);
       setCreatorPackage(creatorData);
       setClients(clientsData);
+      
+      try {
+        const mData = await fetch("/api/monthly-content?year=2026&month=06").then(res => res.json());
+        setMonthlyContent(mData);
+      } catch (err) {
+        console.error("Error loading automatically referenced monthly directory content:", err);
+      }
     } catch (err) {
       console.error("Error fetching web app data:", err);
     }
@@ -1887,11 +1896,17 @@ export default function ClientPortal({ onRefreshPOSData }: ClientPortalProps) {
               <div className="z-10 flex flex-col justify-between h-full space-y-4 md:space-y-6 text-left max-w-sm sm:max-w-md md:w-1/2">
                 <div className="space-y-2">
                   <span className="px-3 py-1 bg-[#1A1A1A] text-white text-[9px] uppercase tracking-widest rounded-full w-max block font-bold">Bespoke Experience</span>
-                  <h1 className="font-serif text-2xl sm:text-3xl md:text-5xl leading-tight text-[#1A1A1A] mt-2">Sculpting <span className="italic">Luxury</span> <br />At Your Fingertips</h1>
+                  {monthlyContent?.text?.["hero-title.txt"] ? (
+                    <h1 className="font-serif text-2xl sm:text-3xl md:text-5xl leading-tight text-[#1A1A1A] mt-2">
+                      {monthlyContent.text["hero-title.txt"]}
+                    </h1>
+                  ) : (
+                    <h1 className="font-serif text-2xl sm:text-3xl md:text-5xl leading-tight text-[#1A1A1A] mt-2">Sculpting <span className="italic">Luxury</span> <br />At Your Fingertips</h1>
+                  )}
                 </div>
                 <div className="space-y-4">
                   <p className="text-[11px] sm:text-xs leading-relaxed text-[#8C8279] italic max-w-sm">
-                    Experience medical-grade Russian manicures, handcrafted 3D gel overlays, and restorative paraffin care customized to your beauty profile.
+                    {monthlyContent?.text?.["hero-subtitle.txt"] || "Experience medical-grade Russian manicures, handcrafted 3D gel overlays, and restorative paraffin care customized to your beauty profile."}
                   </p>
                   <div className="pt-1 flex flex-wrap gap-2.5">
                     <button
@@ -1915,7 +1930,7 @@ export default function ClientPortal({ onRefreshPOSData }: ClientPortalProps) {
               <div className="flex justify-center md:justify-end items-center md:pr-4 relative z-10 w-full md:w-1/2 mt-2 md:mt-0">
                 <div className="w-36 h-48 sm:w-44 sm:h-56 md:w-48 md:h-64 bg-gray-400 pill-mask border-[4px] border-white shadow-2xl overflow-hidden relative">
                   <img
-                    src="https://images.unsplash.com/photo-1604654894610-df63bc536371?w=600&q=80"
+                    src={monthlyContent?.pictures?.["hero-bg.txt"] || "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=600&q=80"}
                     alt="Luxury Model"
                     className="w-full h-full object-cover"
                   />
@@ -2006,6 +2021,64 @@ export default function ClientPortal({ onRefreshPOSData }: ClientPortalProps) {
                 </div>
               )}
             </div>
+
+            {/* Monthly Bulletin Board loaded dynamically from content/ folders */}
+            {monthlyContent && monthlyContent.found && (
+              <div className="space-y-6 pt-4 border-t border-[#E5E0DA]">
+                <div className="flex justify-between items-end border-b border-[#E5E0DA] pb-2 text-left">
+                  <div>
+                    <span className="sub-label">ORGANIC BULLETIN BOARD</span>
+                    <h2 className="text-2xl font-serif italic text-[#1A1A1A] mt-1">
+                      {monthlyContent.text["promo-title.txt"] || "Seasonal Salon Chronicle"}
+                    </h2>
+                    <p className="text-xs text-[#8C8279]">Live broadcast announcements from the salon administration folder system.</p>
+                  </div>
+                  <span className="text-[10px] bg-rose-50 text-[#1A1A1A] font-mono uppercase px-3 py-1 rounded-full border border-rose-200 font-bold tracking-wider">
+                    {monthlyContent.text["promo-tag.txt"] || "Active Curation"}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+                  {/* Markdown Announcement (body/announcement.md) */}
+                  <div className="md:col-span-7 bg-white border border-[#E5E0DA] rounded-[24px] p-6 text-left shadow-xs flex flex-col justify-between">
+                    <div className="space-y-4">
+                      <span className="text-[9px] tracking-[0.14em] uppercase font-bold text-[#8C8279] block">DEAR RED LADY GUEST</span>
+                      <div className="text-stone-700 text-xs leading-relaxed space-y-3 prose prose-stone max-w-none">
+                        {monthlyContent.body["announcement.md"] ? (
+                          <ReactMarkdown>{monthlyContent.body["announcement.md"]}</ReactMarkdown>
+                        ) : (
+                          <p className="italic text-stone-400">Welcome to Red Lady Spa. Connect calendar seasons to view active newsletters from the staff.</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {monthlyContent.body["welcome-note.md"] && (
+                      <div className="mt-6 pt-4 border-t border-[#E5E0DA] text-[11px] text-[#8C8279] italic leading-relaxed">
+                        <ReactMarkdown>{monthlyContent.body["welcome-note.md"]}</ReactMarkdown>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Promo Picture banner (pictures/promo-banner.txt) */}
+                  {monthlyContent.pictures["promo-banner.txt"] && (
+                    <div className="md:col-span-5 relative rounded-[24px] overflow-hidden border border-[#DCD5CD] min-h-[250px] shadow-xs bg-[#FAF9F6]">
+                      <img 
+                        src={monthlyContent.pictures["promo-banner.txt"]} 
+                        alt="Promo spotlight representation" 
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover select-none"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                      <div className="absolute bottom-5 left-5 right-5 text-white text-left space-y-1 z-10 p-1">
+                        <span className="text-[8px] bg-white text-stone-900 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest leading-none">Spotlight Photo</span>
+                        <p className="text-xs font-serif italic text-stone-100 font-semibold truncate">Ref: {monthlyContent.pictures["promo-banner.txt"].substring(0, 48)}...</p>
+                      </div>
+                    </div>
+                  )}
+
+                </div>
+              </div>
+            )}
 
             {/* Top 5 Monthly Trends (Prompt requirement!) */}
             <div className="space-y-4">

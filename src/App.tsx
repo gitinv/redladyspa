@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from "react";
 import ClientPortal from "./components/ClientPortal.tsx";
 import OwnerPOS from "./components/OwnerPOS.tsx";
-import { Sparkles, Calendar, Smartphone, ShieldAlert, MonitorCheck, Compass, HelpCircle } from "lucide-react";
+import AdminUpdatePortal from "./components/AdminUpdatePortal.tsx";
+import { Sparkles, Calendar, Smartphone, ShieldAlert, MonitorCheck, Compass, HelpCircle, HardDrive } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function App() {
   // Routing / Environment State based on window.location.pathname
-  const [activeSpace, setActiveSpace] = useState<"client" | "owner">(() => {
+  const [activeSpace, setActiveSpace] = useState<"client" | "owner" | "admin">(() => {
     if (typeof window !== "undefined") {
       const path = window.location.pathname.toLowerCase();
       if (path.includes("/spapos") || path === "spapos") {
         return "owner";
+      }
+      if (path.includes("/admin") || path === "admin" || path.includes("/adminportal")) {
+        return "admin";
       }
     }
     return "client";
@@ -36,6 +40,8 @@ export default function App() {
       const path = window.location.pathname.toLowerCase();
       if (path.includes("/spapos") || path === "spapos") {
         setActiveSpace("owner");
+      } else if (path.includes("/admin") || path === "admin" || path.includes("/adminportal")) {
+        setActiveSpace("admin");
       } else {
         setActiveSpace("client");
       }
@@ -46,10 +52,12 @@ export default function App() {
   }, []);
 
   // Update URL pathname on switching spaces manually in debug mode
-  const handleSpaceChange = (space: "client" | "owner") => {
+  const handleSpaceChange = (space: "client" | "owner" | "admin") => {
     setActiveSpace(space);
     if (typeof window !== "undefined") {
-      const targetPath = space === "owner" ? "/spapos" : "/";
+      let targetPath = "/";
+      if (space === "owner") targetPath = "/spapos";
+      else if (space === "admin") targetPath = "/admin";
       window.history.pushState({}, "", targetPath);
     }
   };
@@ -86,26 +94,38 @@ export default function App() {
             <div className="flex bg-[#EAE3DC]/50 p-1 rounded-full border border-[#E5E0DA] shadow-inner">
               <button
                 onClick={() => handleSpaceChange("client")}
-                className={`px-5 py-2 rounded-full text-[10px] uppercase tracking-wider font-semibold flex items-center gap-1.5 transition duration-200 cursor-pointer select-none ${
+                className={`px-4 py-2 rounded-full text-[10px] uppercase tracking-wider font-semibold flex items-center gap-1.5 transition duration-200 cursor-pointer select-none ${
                   activeSpace === "client"
                     ? "bg-[#1A1A1A] text-white shadow"
                     : "text-[#8C8279] hover:text-[#1A1A1A]"
                 }`}
               >
                 <Smartphone className="w-3.5 h-3.5 shrink-0" />
-                <span>Customer Portal & Booking</span>
+                <span>Customer Portal</span>
               </button>
               
               <button
                 onClick={() => handleSpaceChange("owner")}
-                className={`px-5 py-2 rounded-full text-[10px] uppercase tracking-wider font-semibold flex items-center gap-1.5 transition duration-200 cursor-pointer select-none ${
+                className={`px-4 py-2 rounded-full text-[10px] uppercase tracking-wider font-semibold flex items-center gap-1.5 transition duration-200 cursor-pointer select-none ${
                   activeSpace === "owner"
                     ? "bg-[#1A1A1A] text-white shadow"
                     : "text-[#8C8279] hover:text-[#1A1A1A]"
                 }`}
               >
                 <MonitorCheck className="w-3.5 h-3.5 shrink-0" />
-                <span>Manager POS Terminal</span>
+                <span>Manager POS</span>
+              </button>
+
+              <button
+                onClick={() => handleSpaceChange("admin")}
+                className={`px-4 py-2 rounded-full text-[10px] uppercase tracking-wider font-semibold flex items-center gap-1.5 transition duration-200 cursor-pointer select-none ${
+                  activeSpace === "admin"
+                    ? "bg-[#1A1A1A] text-white shadow"
+                    : "text-[#8C8279] hover:text-[#1A1A1A]"
+                }`}
+              >
+                <HardDrive className="w-3.5 h-3.5 shrink-0 text-amber-500" />
+                <span>Content Admin</span>
               </button>
             </div>
 
@@ -118,7 +138,7 @@ export default function App() {
         
         {/* Dynamic Space Layout */}
         <AnimatePresence mode="wait">
-          {activeSpace === "client" ? (
+          {activeSpace === "client" && (
             <motion.div
               key="client-portal"
               initial={{ opacity: 0, y: 12 }}
@@ -141,7 +161,9 @@ export default function App() {
               {/* Render Core Client Module */}
               <ClientPortal key={refreshClientToken} onRefreshPOSData={triggerPOSRefresh} />
             </motion.div>
-          ) : (
+          )}
+
+          {activeSpace === "owner" && (
             <motion.div
               key="owner-pos"
               initial={{ opacity: 0, y: 12 }}
@@ -163,6 +185,20 @@ export default function App() {
 
               {/* Render POS Terminal Module */}
               <OwnerPOS key={refreshPOSToken} onRefreshWebData={triggerClientRefresh} />
+            </motion.div>
+          )}
+
+          {activeSpace === "admin" && (
+            <motion.div
+              key="admin-portal"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-6 text-center"
+            >
+              {/* Render Administrative content updater module */}
+              <AdminUpdatePortal />
             </motion.div>
           )}
         </AnimatePresence>

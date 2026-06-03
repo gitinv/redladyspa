@@ -1024,6 +1024,329 @@ async function startServer() {
     res.status(201).json(newReminderNotification);
   });
 
+  // --- ADMINISTRATIVE UPDATE PORTAL FILE & CODE GENERATED CONTENT SYSTEM ---
+  const CONTENT_ROOT = path.join(process.cwd(), "content");
+
+  function ensureDirectoryExists(dirPath: string) {
+    if (!fs.existsSync(dirPath)) {
+      fs.mkdirSync(dirPath, { recursive: true });
+    }
+  }
+
+  function seedDefaultMonthlyContent() {
+    const currentYear = "2026";
+    const currentMonth = "06"; // June 2026 based on user simulated clock
+    
+    const monthDir = path.join(CONTENT_ROOT, currentYear, currentMonth);
+    const picturesDir = path.join(monthDir, "pictures");
+    const bodyDir = path.join(monthDir, "body");
+    const textDir = path.join(monthDir, "text");
+
+    ensureDirectoryExists(CONTENT_ROOT);
+    ensureDirectoryExists(picturesDir);
+    ensureDirectoryExists(bodyDir);
+    ensureDirectoryExists(textDir);
+
+    const defaultFiles = [
+      {
+        dir: textDir,
+        name: "hero-title.txt",
+        content: "Sculpting Luxury At Your Fingertips"
+      },
+      {
+        dir: textDir,
+        name: "hero-subtitle.txt",
+        content: "Experience medical-grade Russian manicures, handcrafted 3D gel overlays, and restorative paraffin care customized to your beauty profile."
+      },
+      {
+        dir: textDir,
+        name: "promo-title.txt",
+        content: "The Midnight Velvet Salon Soiree"
+      },
+      {
+        dir: textDir,
+        name: "promo-tag.txt",
+        content: "June Platinum Release"
+      },
+      {
+        dir: bodyDir,
+        name: "announcement.md",
+        content: "### Welcome to our Starlight June Event!\n\nThis month, we are highlighting our **Aurora Velvet Magnetic Polish** and handcrafted **3D sculptural pieces** designed in-house by our master polishers. Enjoy an exclusive discount of **20% off** on your next weekend appointment.\n\n#### What's New:\n- Individualized structural nail builder base overlay.\n- Complimentary honey-citrus hot wrap therapy with every signature manicure.\n- Organic paraffin wax enriched with Moroccan oil."
+      },
+      {
+        dir: bodyDir,
+        name: "welcome-note.md",
+        content: "#### Dear Red Lady Valued Guest,\n\nOur philosophy rests on the belief that nail therapy is a crucial facet of self-expression and personal styling. Every lacquer layer, every meticulous file edge is executed with medical-grade sterile tools and artisanal perfection."
+      },
+      {
+        dir: picturesDir,
+        name: "hero-bg.txt",
+        content: "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=600&q=80"
+      },
+      {
+        dir: picturesDir,
+        name: "promo-banner.txt",
+        content: "https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=600&q=80"
+      }
+    ];
+
+    defaultFiles.forEach(f => {
+      const filePath = path.join(f.dir, f.name);
+      if (!fs.existsSync(filePath)) {
+        fs.writeFileSync(filePath, f.content, "utf8");
+      }
+    });
+  }
+
+  function buildContentTree(dir: string, relativePath: string = ""): any {
+    const absolutePath = path.join(dir, relativePath);
+    if (!fs.existsSync(absolutePath)) return null;
+
+    const stat = fs.statSync(absolutePath);
+    if (stat.isDirectory()) {
+      const children = fs.readdirSync(absolutePath);
+      const item: any = {
+        name: relativePath ? path.basename(absolutePath) : "content",
+        type: "directory",
+        path: relativePath ? `content/${relativePath}`.replace(/\\/g, "/") : "content",
+        children: []
+      };
+      
+      children.forEach(child => {
+        const childTree = buildContentTree(dir, relativePath ? path.join(relativePath, child) : child);
+        if (childTree) {
+          item.children.push(childTree);
+        }
+      });
+
+      // Sort: folders first, then alphabetically, other attributes
+      item.children.sort((a: any, b: any) => {
+        if (a.type !== b.type) {
+          return a.type === "directory" ? -1 : 1;
+        }
+        return b.name.localeCompare(a.name); // Prefer newer years and months first
+      });
+      return item;
+    } else {
+      return {
+        name: path.basename(absolutePath),
+        type: "file",
+        path: `content/${relativePath}`.replace(/\\/g, "/"),
+        size: stat.size
+      };
+    }
+  }
+
+  // Pre-seed default data at startup
+  seedDefaultMonthlyContent();
+
+  // 1. Get complete content tree structure
+  app.get("/api/admin-content/tree", (req, res) => {
+    try {
+      ensureDirectoryExists(CONTENT_ROOT);
+      seedDefaultMonthlyContent();
+      const tree = buildContentTree(CONTENT_ROOT);
+      res.json(tree);
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // 2. Read single file content
+  app.get("/api/admin-content/file", (req, res) => {
+    const relativePath = req.query.path as string;
+    if (!relativePath || !relativePath.startsWith("content/")) {
+      return res.status(400).json({ error: "Invalid content path format" });
+    }
+    const safePath = path.normalize(relativePath).replace(/^content\//, "");
+    if (safePath.includes("..")) {
+      return res.status(403).json({ error: "Access Denied" });
+    }
+    const absolutePath = path.join(CONTENT_ROOT, safePath);
+    if (!absolutePath.startsWith(CONTENT_ROOT)) {
+      return res.status(403).json({ error: "Access Denied" });
+    }
+    if (!fs.existsSync(absolutePath)) {
+      return res.status(404).json({ error: "File not found" });
+    }
+    try {
+      const content = fs.readFileSync(absolutePath, "utf8");
+      res.json({ path: relativePath, content });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // 3. Write or save single file content
+  app.post("/api/admin-content/file", (req, res) => {
+    const { path: relativePath, content } = req.body;
+    if (!relativePath || !relativePath.startsWith("content/")) {
+      return res.status(400).json({ error: "Invalid content path format" });
+    }
+    const safePath = path.normalize(relativePath).replace(/^content\//, "");
+    if (safePath.includes("..")) {
+      return res.status(403).json({ error: "Access Denied" });
+    }
+    const absolutePath = path.join(CONTENT_ROOT, safePath);
+    if (!absolutePath.startsWith(CONTENT_ROOT)) {
+      return res.status(403).json({ error: "Access Denied" });
+    }
+    try {
+      ensureDirectoryExists(path.dirname(absolutePath));
+      fs.writeFileSync(absolutePath, content || "", "utf8");
+      res.json({ success: true, path: relativePath });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // 4. Create new Year / Month organizational monthly content folder structure
+  app.post("/api/admin-content/create-month", (req, res) => {
+    const { year, month } = req.body;
+    if (!year || !month) {
+      return res.status(400).json({ error: "Year and Month coordinates are required." });
+    }
+    
+    const formattedMonth = String(month).padStart(2, "0");
+    const monthDir = path.join(CONTENT_ROOT, String(year), formattedMonth);
+    const picturesDir = path.join(monthDir, "pictures");
+    const bodyDir = path.join(monthDir, "body");
+    const textDir = path.join(monthDir, "text");
+
+    try {
+      ensureDirectoryExists(picturesDir);
+      ensureDirectoryExists(bodyDir);
+      ensureDirectoryExists(textDir);
+
+      const defaults = [
+        { d: textDir, n: "hero-title.txt", c: `Luxury Curations for ${year}/${formattedMonth}` },
+        { d: textDir, n: "hero-subtitle.txt", c: "Enjoy bespoke nail treatments formulated and scheduled for this special season of the year." },
+        { d: textDir, n: "promo-title.txt", c: `Seasonal Salon Special - ${year}/${formattedMonth}` },
+        { d: textDir, n: "promo-tag.txt", c: `Active Limited-edition` },
+        { d: bodyDir, n: "announcement.md", c: `### New Announcements for ${year}-${formattedMonth}!\n\nWe have initialized this month folder structure. Go ahead and replace this Markdown body content on the administration screen.` },
+        { d: bodyDir, n: "welcome-note.md", c: `Welcome to our ${year}/${formattedMonth} catalog! Experience custom designs curated specifically for you.` },
+        { d: picturesDir, n: "hero-bg.txt", c: "https://images.unsplash.com/photo-1632345031435-8797b2d58045?w=600&q=80" },
+        { d: picturesDir, n: "promo-banner.txt", c: "https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?w=600&q=80" }
+      ];
+
+      defaults.forEach(f => {
+        const filePath = path.join(f.d, f.n);
+        if (!fs.existsSync(filePath)) {
+          fs.writeFileSync(filePath, f.c, "utf8");
+        }
+      });
+
+      res.json({ success: true, message: `Created content folders content/${year}/${formattedMonth}` });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // 5. Delete single file
+  app.post("/api/admin-content/delete-file", (req, res) => {
+    const { path: relativePath } = req.body;
+    if (!relativePath || !relativePath.startsWith("content/")) {
+      return res.status(400).json({ error: "Invalid path format" });
+    }
+    const safePath = path.normalize(relativePath).replace(/^content\//, "");
+    if (safePath.includes("..")) {
+      return res.status(403).json({ error: "Access Denied" });
+    }
+    const absolutePath = path.join(CONTENT_ROOT, safePath);
+    if (!absolutePath.startsWith(CONTENT_ROOT)) {
+      return res.status(403).json({ error: "Access Denied" });
+    }
+    try {
+      if (fs.existsSync(absolutePath)) {
+        fs.unlinkSync(absolutePath);
+        res.json({ success: true });
+      } else {
+        res.status(404).json({ error: "File not found" });
+      }
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // 6. Delete a month folder entirely
+  app.post("/api/admin-content/delete-month", (req, res) => {
+    const { year, month } = req.body;
+    if (!year || !month) {
+      return res.status(400).json({ error: "Year and Month are required" });
+    }
+    const formattedMonth = String(month).padStart(2, "0");
+    const monthDir = path.join(CONTENT_ROOT, String(year), formattedMonth);
+    if (!monthDir.startsWith(CONTENT_ROOT) || monthDir === CONTENT_ROOT) {
+      return res.status(403).json({ error: "Invalid paths" });
+    }
+    try {
+      if (fs.existsSync(monthDir)) {
+        fs.rmSync(monthDir, { recursive: true, force: true });
+        res.json({ success: true, message: `Successfully deleted monthly folder content/${year}/${formattedMonth}` });
+      } else {
+        res.status(404).json({ error: "Folder not found" });
+      }
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // 7. Get assembled content list for a month (Read by the entire application stack dynamically)
+  app.get("/api/monthly-content", (req, res) => {
+    const year = (req.query.year as string) || "2026";
+    const month = (req.query.month as string) || "06";
+    const formattedMonth = String(month).padStart(2, "0");
+    
+    const monthDir = path.join(CONTENT_ROOT, year, formattedMonth);
+    if (!fs.existsSync(monthDir)) {
+      return res.json({ year, month: formattedMonth, text: {}, body: {}, pictures: {}, found: false });
+    }
+
+    try {
+      const text: Record<string, string> = {};
+      const body: Record<string, string> = {};
+      const pictures: Record<string, string> = {};
+
+      const textDir = path.join(monthDir, "text");
+      if (fs.existsSync(textDir)) {
+        fs.readdirSync(textDir).forEach(file => {
+          if (file.endsWith(".txt") || file.endsWith(".json")) {
+            text[file] = fs.readFileSync(path.join(textDir, file), "utf8");
+          }
+        });
+      }
+
+      const bodyDir = path.join(monthDir, "body");
+      if (fs.existsSync(bodyDir)) {
+        fs.readdirSync(bodyDir).forEach(file => {
+          if (file.endsWith(".md") || file.endsWith(".html") || file.endsWith(".txt")) {
+            body[file] = fs.readFileSync(path.join(bodyDir, file), "utf8");
+          }
+        });
+      }
+
+      const picturesDir = path.join(monthDir, "pictures");
+      if (fs.existsSync(picturesDir)) {
+        fs.readdirSync(picturesDir).forEach(file => {
+          if (file.endsWith(".txt") || file.endsWith(".jpg") || file.endsWith(".png") || file.endsWith(".jpeg")) {
+            pictures[file] = fs.readFileSync(path.join(picturesDir, file), "utf8");
+          }
+        });
+      }
+
+      res.json({
+        year,
+        month: formattedMonth,
+        text,
+        body,
+        pictures,
+        found: true
+      });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
   // --- VITE DEV / PROD SERVING ---
 
   // Express v4 app.get('*') covers all requests that didn't hit an api endpoint
