@@ -659,6 +659,8 @@ export default function ClientPortal({ onRefreshPOSData }: ClientPortalProps) {
   // Render the core portal views
   const renderClientContent = () => {
     const isMobileSim = viewport === "iphone" || viewport === "android";
+    const isTabletSim = viewport === "tablet";
+    const isWeb = viewport === "web";
     switch (activeTab) {
       case "products":
         return (
@@ -770,7 +772,7 @@ export default function ClientPortal({ onRefreshPOSData }: ClientPortalProps) {
                     </div>
 
                     {/* Wizard Category Button Picker */}
-                    <div className="flex flex-wrap gap-1.5 p-1 bg-stone-50 rounded-xl border border-stone-150">
+                    <div className="grid grid-cols-4 gap-1 p-1 bg-stone-50 rounded-xl border border-stone-150 w-full select-none">
                       {["Mani Bar", "Pedi Bar", "Nails Bar", "Add Aura"].map((cat) => {
                         const isSel = wizardCategory === cat;
                         return (
@@ -778,7 +780,7 @@ export default function ClientPortal({ onRefreshPOSData }: ClientPortalProps) {
                             key={cat}
                             type="button"
                             onClick={() => setWizardCategory(cat)}
-                            className={`flex-1 text-center font-bold uppercase tracking-wider text-[9px] py-2 px-1.5 rounded-lg transition-all ${
+                            className={`text-center font-bold uppercase tracking-wider text-[8px] min-[360px]:text-[9px] sm:text-[10px] py-2 px-0.5 sm:px-1.5 rounded-lg transition-all cursor-pointer ${
                               isSel
                                 ? "bg-[#1A1A1A] text-white shadow-xs"
                                 : "text-stone-500 hover:text-[#1A1A1A] hover:bg-stone-200/50"
@@ -1767,16 +1769,16 @@ export default function ClientPortal({ onRefreshPOSData }: ClientPortalProps) {
             </div>
 
             {/* The Red Lady button-based Category Picker */}
-            <div className="flex flex-wrap gap-2 p-1.5 bg-stone-100/80 rounded-2xl border border-stone-200/50">
+            <div className="grid grid-cols-4 gap-1 p-1 bg-stone-100/80 rounded-2xl border border-stone-200/50 w-full select-none">
               {["Mani Bar", "Pedi Bar", "Nails Bar", "Add Aura"].map((cat) => {
                 const isActive = activeServiceCategory === cat;
                 return (
                   <button
                     key={cat}
                     onClick={() => setActiveServiceCategory(cat)}
-                    className={`flex-1 min-w-[90px] text-center font-bold font-display uppercase tracking-wider text-[10px] py-3 px-2 rounded-xl transition-all duration-200 cursor-pointer ${
+                    className={`text-center font-bold font-display uppercase tracking-wider text-[8px] min-[360px]:text-[9px] sm:text-[10px] py-3 px-0.5 sm:px-2 rounded-xl transition-all duration-200 cursor-pointer ${
                       isActive
-                        ? "bg-stone-900 text-white shadow-md scale-102"
+                        ? "bg-stone-900 text-white shadow-md"
                         : "bg-transparent text-stone-600 hover:text-stone-900 hover:bg-white/45"
                     }`}
                   >
@@ -1886,242 +1888,357 @@ export default function ClientPortal({ onRefreshPOSData }: ClientPortalProps) {
 
       case "home":
       default:
-        return (
-          <div className="space-y-10">
-            {/* Elegant Spa Hero Banner */}
-            <div className="relative bg-[#EAE3DC] rounded-[32px] p-6 sm:p-8 md:p-12 h-auto md:h-[350px] flex md:flex-row flex-col justify-between items-center overflow-hidden border border-[#DCD5CD] gap-6">
-              {/* Gold pill shape floating behind */}
-              <div className="absolute right-[-40px] bottom-[-60px] w-[280px] h-[400px] bg-[#D4AF37] pill-mask rotate-12 opacity-30 mix-blend-multiply pointer-events-none"></div>
-              
-              <div className="z-10 flex flex-col justify-between h-full space-y-4 md:space-y-6 text-left max-w-sm sm:max-w-md md:w-1/2">
-                <div className="space-y-2">
-                  <span className="px-3 py-1 bg-[#1A1A1A] text-white text-[9px] uppercase tracking-widest rounded-full w-max block font-bold">Bespoke Experience</span>
-                  {monthlyContent?.text?.["hero-title.txt"] ? (
-                    <h1 className="font-serif text-2xl sm:text-3xl md:text-5xl leading-tight text-[#1A1A1A] mt-2">
-                      {monthlyContent.text["hero-title.txt"]}
-                    </h1>
-                  ) : (
-                    <h1 className="font-serif text-2xl sm:text-3xl md:text-5xl leading-tight text-[#1A1A1A] mt-2">Sculpting <span className="italic">Luxury</span> <br />At Your Fingertips</h1>
-                  )}
-                </div>
-                <div className="space-y-4">
-                  <p className="text-[11px] sm:text-xs leading-relaxed text-[#8C8279] italic max-w-sm">
-                    {monthlyContent?.text?.["hero-subtitle.txt"] || "Experience medical-grade Russian manicures, handcrafted 3D gel overlays, and restorative paraffin care customized to your beauty profile."}
-                  </p>
-                  <div className="pt-1 flex flex-wrap gap-2.5">
-                    <button
-                      onClick={() => setActiveTab("book")}
-                      className="bg-[#1A1A1A] text-stone-100 hover:bg-stone-800 px-5 py-2.5 sm:px-6 sm:py-3 rounded-full text-[9px] sm:text-[10px] tracking-wider uppercase font-bold transition duration-200 flex items-center gap-1.5 cursor-pointer select-none"
-                    >
-                      <span>Reserve Slot Now</span>
-                      <ArrowRight className="w-3 sm:w-3.5 h-3 sm:h-3.5" />
-                    </button>
-                    <button
-                      onClick={() => setActiveTab("products")}
-                      className="border border-[#1A1A1A] text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white px-5 py-2.5 sm:px-6 sm:py-3 rounded-full text-[9px] sm:text-[10px] tracking-wider uppercase font-bold transition duration-200 cursor-pointer select-none"
-                    >
-                      Shop
-                    </button>
+        {
+          // Setup dynamic styling for Hero based on simulated viewports
+          const heroContainerClass = isMobileSim
+            ? "relative bg-[#EAE3DC] rounded-[32px] p-5 h-auto flex flex-col justify-between items-center overflow-hidden border border-[#DCD5CD] gap-4"
+            : isTabletSim
+            ? "relative bg-[#EAE3DC] rounded-[24px] p-5 h-[230px] flex flex-row justify-between items-center overflow-hidden border border-[#DCD5CD] gap-3"
+            : "relative bg-[#EAE3DC] rounded-[32px] p-6 sm:p-8 md:p-12 h-auto md:h-[350px] flex md:flex-row flex-col justify-between items-center overflow-hidden border border-[#DCD5CD] gap-6";
+
+          const heroTextColClass = isMobileSim
+            ? "z-10 flex flex-col justify-between h-auto space-y-3 text-center items-center w-full"
+            : isTabletSim
+            ? "z-10 flex flex-col justify-between h-full space-y-2 text-left w-[62%]"
+            : "z-10 flex flex-col justify-between h-full space-y-4 md:space-y-6 text-left w-full md:w-1/2";
+
+          const heroTitleClass = isMobileSim
+            ? "font-serif text-[17px] leading-tight text-[#1A1A1A] mt-1 break-words font-bold"
+            : isTabletSim
+            ? "font-serif text-lg xs:text-xl leading-snug text-[#1A1A1A] mt-0.5 break-words font-bold"
+            : "font-serif text-xl min-[360px]:text-2xl sm:text-3xl md:text-4xl lg:text-5xl leading-tight text-[#1A1A1A] mt-2 break-words";
+
+          const heroSubtitleClass = isMobileSim
+            ? "text-[10px] leading-relaxed text-[#8C8279] italic max-w-[260px]"
+            : isTabletSim
+            ? "text-[10px] sm:text-[10.5px] leading-relaxed text-[#8C8279] italic max-w-sm line-clamp-2"
+            : "text-[11px] sm:text-xs leading-relaxed text-[#8C8279] italic max-w-sm";
+
+          const heroBtnContainerClass = isMobileSim
+            ? "pt-0.5 flex flex-row flex-wrap justify-center gap-2"
+            : "pt-1 flex flex-wrap gap-2";
+
+          const heroGraphicColClass = isMobileSim
+            ? "flex justify-center items-center relative z-10 w-full shrink-0"
+            : isTabletSim
+            ? "flex justify-end items-center relative z-10 w-[35%] shrink-0"
+            : "flex justify-center md:justify-end items-center md:pr-4 relative z-10 w-full md:w-1/2 mt-2 md:mt-0";
+
+          const heroPillFrameClass = isMobileSim
+            ? "w-24 h-32 bg-gray-400 pill-mask border-[3px] border-white shadow-md overflow-hidden relative"
+            : isTabletSim
+            ? "w-[100px] h-[135px] bg-gray-400 pill-mask border-[3px] border-white shadow-md overflow-hidden relative"
+            : "w-36 h-48 sm:w-44 sm:h-56 md:w-48 md:h-64 bg-gray-400 pill-mask border-[4px] border-white shadow-2xl overflow-hidden relative";
+
+          return (
+            <div className="space-y-10">
+              {/* Elegant Spa Hero Banner */}
+              <div className={heroContainerClass}>
+                {/* Gold pill shape floating behind */}
+                <div className="absolute right-[-40px] bottom-[-60px] w-[280px] h-[400px] bg-[#D4AF37] pill-mask rotate-12 opacity-30 mix-blend-multiply pointer-events-none"></div>
+                
+                <div className={heroTextColClass}>
+                  <div className="space-y-1 sm:space-y-2">
+                    <span className="px-3 py-1 bg-[#1A1A1A] text-white text-[9px] uppercase tracking-widest rounded-full w-max block font-bold">Bespoke Experience</span>
+                    {monthlyContent?.text?.["hero-title.txt"] ? (
+                      <h1 className={heroTitleClass}>
+                        {monthlyContent.text["hero-title.txt"]}
+                      </h1>
+                    ) : (
+                      <h1 className={heroTitleClass}>
+                        Sculpting <span className="italic">Luxury</span> At Your Fingertips
+                      </h1>
+                    )}
                   </div>
-                </div>
-              </div>
-
-              {/* Right decorative pill image frame - Enabled and formatted for both Desktop and Mobile */}
-              <div className="flex justify-center md:justify-end items-center md:pr-4 relative z-10 w-full md:w-1/2 mt-2 md:mt-0">
-                <div className="w-36 h-48 sm:w-44 sm:h-56 md:w-48 md:h-64 bg-gray-400 pill-mask border-[4px] border-white shadow-2xl overflow-hidden relative">
-                  <img
-                    src={monthlyContent?.pictures?.["hero-bg.txt"] || "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=600&q=80"}
-                    alt="Luxury Model"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
-                  <span className="absolute bottom-3 left-1/2 -translate-x-1/2 text-white text-[9px] sm:text-[10px] tracking-wider uppercase font-bold font-serif italic whitespace-nowrap bg-black/40 backdrop-blur-xs px-2.5 py-1 rounded-md">Bespoke Polish</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Creator of the Month Customizable Package (Prompt requirement!) */}
-            <div className="space-y-4">
-              <div className="flex justify-between items-end border-b border-[#E5E0DA] pb-2 text-left">
-                <div>
-                  <span className="sub-label">EXCLUSIVE CAMPAIGN</span>
-                  <h2 className="text-2xl font-serif italic text-[#1A1A1A] mt-1">Creator of the Month Package</h2>
-                  <p className="text-xs text-[#8C8279]">Every month, one beauty influencer designs a custom-tailored luxury nail template.</p>
-                </div>
-                <span className="text-[10px] font-mono uppercase bg-[#EAE3DC] text-[#1A1A1A] px-3.5 py-1.5 rounded-full font-bold border border-[#DCD5CD]">
-                  June Special
-                </span>
-              </div>
-
-              {creatorPackage && (
-                <div className="bg-white border border-[#E5E0DA] rounded-[32px] overflow-hidden shadow-xs grid grid-cols-1 md:grid-cols-12 gap-0">
-                  <div className="md:col-span-5 h-64 md:h-full min-h-[300px] relative overflow-hidden bg-[#F9F6F2]">
-                    <img
-                      src={creatorPackage.image}
-                      alt={creatorPackage.packageName}
-                      referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover select-none"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#131110] via-transparent to-transparent"></div>
-                    <div className="absolute bottom-5 left-5 flex items-center gap-3">
-                      <img
-                        src={creatorPackage.avatar}
-                        alt={creatorPackage.influencerName}
-                        referrerPolicy="no-referrer"
-                        className="w-11 h-11 rounded-full border-2 border-white object-cover"
-                      />
-                      <div className="text-left text-white leading-none shadow-xs">
-                        <p className="text-[9px] text-[#D4AF37] tracking-[0.12em] uppercase font-bold">Specialist Designer</p>
-                        <span className="text-xs sm:text-sm md:text-base font-serif italic leading-none whitespace-nowrap block mt-1">{creatorPackage.influencerName}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="md:col-span-7 p-8 space-y-6 flex flex-col justify-between text-left">
-                    <div className="space-y-3 text-left">
-                      <span className="text-[9px] tracking-[0.15em] uppercase font-bold text-[#8C8279]">Curated Edition</span>
-                      <h3 className="text-2xl font-serif italic text-[#1A1A1A] leading-tight">{creatorPackage.packageName} Collection</h3>
-                      <p className="text-xs text-[#8C8279] leading-relaxed text-justify">{creatorPackage.packageDescription}</p>
-
-                      <div className="pt-2 text-left space-y-2">
-                        <span className="text-[9px] tracking-[0.12em] uppercase text-[#8C8279] block font-bold">Services & Treatments Included:</span>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {creatorPackage.itemsIncluded.map((item, id) => (
-                            <div key={id} className="flex items-center gap-2 text-stone-605 text-[10.5px]">
-                              <Check className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
-                              <span className="truncate">{item}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="pt-5 border-t border-[#E5E0DA] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                      <div>
-                        <span className="text-[10px] text-[#8C8279] uppercase tracking-wider font-bold block">Custom Curated Package Price</span>
-                        <div className="flex items-baseline gap-2 mt-1">
-                          <span className="text-2xl font-bold text-[#1A1A1A] font-mono">${creatorPackage.packagePrice.toFixed(2)}</span>
-                          <span className="text-xs text-[#8C8279] font-mono line-through">$190.00 value</span>
-                        </div>
-                      </div>
-
+                  <div className="space-y-2 md:space-y-4">
+                    <p className={heroSubtitleClass}>
+                      {monthlyContent?.text?.["hero-subtitle.txt"] || "Experience medical-grade Russian manicures, handcrafted 3D gel overlays, and restorative paraffin care customized to your beauty profile."}
+                    </p>
+                    <div className={heroBtnContainerClass}>
                       <button
-                        onClick={() => {
-                          const matchingService = services.find(s => s.name.includes("Creator Customized"));
-                          if (matchingService) {
-                            setSelectedServices([matchingService]);
-                          } else {
-                            setSelectedServices([{
-                              category: "Nails Bar",
-                              name: `Creator Customized Pack: ${creatorPackage?.packageName || "Midnight Velvet Spark"}`,
-                              price: creatorPackage?.packagePrice || 145.00,
-                              duration: "100 mins",
-                              desc: creatorPackage?.packageDescription || ""
-                            }]);
-                          }
-                          setWizardCategory("Nails Bar");
-                          setActiveServiceCategory("Nails Bar");
-                          setActiveTab("book");
-                        }}
-                        className="bg-[#1A1A1A] hover:bg-stone-850 text-white font-semibold px-6 py-3 rounded-full text-[10px] uppercase tracking-widest transition flex items-center gap-1.5 cursor-pointer select-none"
+                        onClick={() => setActiveTab("book")}
+                        className="bg-[#1A1A1A] text-stone-100 hover:bg-stone-800 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-[9px] sm:text-[10px] tracking-wider uppercase font-bold transition duration-200 flex items-center gap-1 cursor-pointer select-none"
                       >
-                        Book Customized Package
-                        <ChevronRight className="w-4 h-4 text-[#D4AF37]" />
+                        <span>Reserve Slot</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </button>
+                      <button
+                        onClick={() => setActiveTab("products")}
+                        className="border border-[#1A1A1A] text-[#1A1A1A] hover:bg-[#1A1A1A] hover:text-white px-4 py-2 sm:px-5 sm:py-2.5 rounded-full text-[9px] sm:text-[10px] tracking-wider uppercase font-bold transition duration-200 cursor-pointer select-none"
+                      >
+                        Shop
                       </button>
                     </div>
                   </div>
                 </div>
-              )}
-            </div>
 
-            {/* Monthly Bulletin Board loaded dynamically from content/ folders */}
-            {monthlyContent && monthlyContent.found && (
-              <div className="space-y-6 pt-4 border-t border-[#E5E0DA]">
-                <div className="flex justify-between items-end border-b border-[#E5E0DA] pb-2 text-left">
-                  <div>
-                    <span className="sub-label">ORGANIC BULLETIN BOARD</span>
-                    <h2 className="text-2xl font-serif italic text-[#1A1A1A] mt-1">
-                      {monthlyContent.text["promo-title.txt"] || "Seasonal Salon Chronicle"}
-                    </h2>
-                    <p className="text-xs text-[#8C8279]">Live broadcast announcements from the salon administration folder system.</p>
+                {/* Right decorative pill image frame */}
+                <div className={heroGraphicColClass}>
+                  <div className={heroPillFrameClass}>
+                    <img
+                      src={monthlyContent?.pictures?.["hero-bg.txt"] || "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=600&q=80"}
+                      alt="Luxury Model"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+                    <span className="absolute bottom-2 left-1/2 -translate-x-1/2 text-white text-[8px] sm:text-[9px] tracking-wider uppercase font-bold font-serif italic whitespace-nowrap bg-black/40 backdrop-blur-xs px-2 py-0.5 rounded-md">Bespoke Polish</span>
                   </div>
-                  <span className="text-[10px] bg-rose-50 text-[#1A1A1A] font-mono uppercase px-3 py-1 rounded-full border border-rose-200 font-bold tracking-wider">
-                    {monthlyContent.text["promo-tag.txt"] || "Active Curation"}
-                  </span>
                 </div>
+              </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
-                  {/* Markdown Announcement (body/announcement.md) */}
-                  <div className="md:col-span-7 bg-white border border-[#E5E0DA] rounded-[24px] p-6 text-left shadow-xs flex flex-col justify-between">
-                    <div className="space-y-4">
-                      <span className="text-[9px] tracking-[0.14em] uppercase font-bold text-[#8C8279] block">DEAR RED LADY GUEST</span>
-                      <div className="text-stone-700 text-xs leading-relaxed space-y-3 prose prose-stone max-w-none">
-                        {monthlyContent.body["announcement.md"] ? (
-                          <ReactMarkdown>{monthlyContent.body["announcement.md"]}</ReactMarkdown>
-                        ) : (
-                          <p className="italic text-stone-400">Welcome to Red Lady Spa. Connect calendar seasons to view active newsletters from the staff.</p>
-                        )}
-                      </div>
-                    </div>
+            {/* Creator of the Month Customizable Package (Prompt requirement!) */}
+            <div className="space-y-4">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end justify-start items-start gap-3 border-b border-[#E5E0DA] pb-2 text-left">
+                <div className="max-w-md sm:max-w-lg md:max-w-2xl">
+                  <span className="sub-label">EXCLUSIVE CAMPAIGN</span>
+                  <h2 className="text-xl sm:text-2xl font-serif italic text-[#1A1A1A] mt-1">Creator of the Month Package</h2>
+                  <p className="text-[11px] sm:text-xs text-[#8C8279]">Every month, one beauty influencer designs a custom-tailored luxury nail template.</p>
+                </div>
+                <span className="text-[9px] sm:text-[10px] font-mono uppercase bg-[#EAE3DC] text-[#1A1A1A] px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full font-bold border border-[#DCD5CD] shrink-0">
+                  June Special
+                </span>
+              </div>
 
-                    {monthlyContent.body["welcome-note.md"] && (
-                      <div className="mt-6 pt-4 border-t border-[#E5E0DA] text-[11px] text-[#8C8279] italic leading-relaxed">
-                        <ReactMarkdown>{monthlyContent.body["welcome-note.md"]}</ReactMarkdown>
-                      </div>
-                    )}
-                  </div>
+              {creatorPackage && (() => {
+                const creatorCardContainerClass = isMobileSim
+                  ? "bg-white border border-[#E5E0DA] rounded-[32px] overflow-hidden shadow-xs flex flex-col"
+                  : isTabletSim
+                  ? "bg-white border border-[#E5E0DA] rounded-[24px] overflow-hidden shadow-xs grid grid-cols-12 gap-0"
+                  : "bg-white border border-[#E5E0DA] rounded-[32px] overflow-hidden shadow-xs grid grid-cols-1 md:grid-cols-12 gap-0";
 
-                  {/* Promo Picture banner (pictures/promo-banner.txt) */}
-                  {monthlyContent.pictures["promo-banner.txt"] && (
-                    <div className="md:col-span-5 relative rounded-[24px] overflow-hidden border border-[#DCD5CD] min-h-[250px] shadow-xs bg-[#FAF9F6]">
-                      <img 
-                        src={monthlyContent.pictures["promo-banner.txt"]} 
-                        alt="Promo spotlight representation" 
+                const creatorImgColClass = isMobileSim
+                  ? "h-48 w-full relative overflow-hidden bg-[#F9F6F2]"
+                  : isTabletSim
+                  ? "col-span-5 h-full relative overflow-hidden bg-[#F9F6F2]"
+                  : "md:col-span-5 h-64 md:h-full min-h-[300px] relative overflow-hidden bg-[#F9F6F2]";
+
+                const creatorTextColClass = isMobileSim
+                  ? "p-5 space-y-4 flex flex-col justify-between text-left"
+                  : isTabletSim
+                  ? "col-span-7 p-5 space-y-4 flex flex-col justify-between text-left"
+                  : "md:col-span-7 p-8 space-y-6 flex flex-col justify-between text-left";
+
+                const creatorTitleClass = isMobileSim
+                  ? "text-lg font-serif italic text-[#1A1A1A] leading-tight"
+                  : isTabletSim
+                  ? "text-lg sm:text-xl font-serif italic text-[#1A1A1A] leading-tight"
+                  : "text-2xl font-serif italic text-[#1A1A1A] leading-tight";
+
+                const creatorDescClass = isMobileSim
+                  ? "text-[11px] text-[#8C8279] leading-relaxed text-justify line-clamp-3"
+                  : "text-xs text-[#8C8279] leading-relaxed text-justify";
+
+                const creatorInclusionsClass = isMobileSim
+                  ? "grid grid-cols-1 gap-1"
+                  : "grid grid-cols-1 sm:grid-cols-2 gap-1.5";
+
+                const creatorActionsClass = isMobileSim
+                  ? "pt-4 border-t border-[#E5E0DA] flex flex-col gap-3"
+                  : isTabletSim
+                  ? "pt-4 border-t border-[#E5E0DA] flex flex-row justify-between items-center gap-3"
+                  : "pt-5 border-t border-[#E5E0DA] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4";
+
+                const creatorBtnClass = isMobileSim
+                  ? "bg-[#1A1A1A] hover:bg-stone-850 text-white font-semibold px-4 py-2.5 rounded-full text-[9px] uppercase tracking-wider transition flex items-center justify-center gap-1.5 cursor-pointer select-none w-full"
+                  : "bg-[#1A1A1A] hover:bg-stone-850 text-white font-semibold px-5 py-2.5 sm:px-6 sm:py-3 rounded-full text-[10px] uppercase tracking-widest transition flex items-center gap-1.5 cursor-pointer select-none";
+
+                return (
+                  <div className={creatorCardContainerClass}>
+                    <div className={creatorImgColClass}>
+                      <img
+                        src={creatorPackage.image}
+                        alt={creatorPackage.packageName}
                         referrerPolicy="no-referrer"
                         className="w-full h-full object-cover select-none"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                      <div className="absolute bottom-5 left-5 right-5 text-white text-left space-y-1 z-10 p-1">
-                        <span className="text-[8px] bg-white text-stone-900 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest leading-none">Spotlight Photo</span>
-                        <p className="text-xs font-serif italic text-stone-100 font-semibold truncate">Ref: {monthlyContent.pictures["promo-banner.txt"].substring(0, 48)}...</p>
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#131110] via-transparent to-transparent"></div>
+                      <div className="absolute bottom-4 left-4 flex items-center gap-2">
+                        <img
+                          src={creatorPackage.avatar}
+                          alt={creatorPackage.influencerName}
+                          referrerPolicy="no-referrer"
+                          className="w-9 h-9 sm:w-11 sm:h-11 rounded-full border-2 border-white object-cover"
+                        />
+                        <div className="text-left text-white leading-none shadow-xs">
+                          <p className="text-[8px] text-[#D4AF37] tracking-[0.12em] uppercase font-bold">Specialist Designer</p>
+                          <span className="text-xs font-serif italic block mt-0.5">{creatorPackage.influencerName}</span>
+                        </div>
                       </div>
                     </div>
-                  )}
 
+                    <div className={creatorTextColClass}>
+                      <div className="space-y-3 text-left">
+                        <span className="text-[9px] tracking-[0.12em] uppercase font-bold text-[#8C8279]">Curated Edition</span>
+                        <h3 className={creatorTitleClass}>{creatorPackage.packageName} Collection</h3>
+                        <p className={creatorDescClass}>{creatorPackage.packageDescription}</p>
+
+                        <div className="pt-1.5 text-left space-y-1.5">
+                          <span className="text-[8px] sm:text-[9px] tracking-[0.12em] uppercase text-[#8C8279] block font-bold">Services Included:</span>
+                          <div className={creatorInclusionsClass}>
+                            {creatorPackage.itemsIncluded.slice(0, 4).map((item, id) => (
+                              <div key={id} className="flex items-center gap-1.5 text-stone-600 text-[10px]">
+                                <Check className="w-3 h-3 text-[#D4AF37] shrink-0" />
+                                <span className="truncate">{item}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className={creatorActionsClass}>
+                        <div>
+                          <span className="text-[8.5px] text-[#8C8279] uppercase tracking-wider font-bold block">Curated Package Price</span>
+                          <div className="flex items-baseline gap-1.5 mt-0.5">
+                            <span className="text-xl sm:text-2xl font-bold text-[#1A1A1A] font-mono">${creatorPackage.packagePrice.toFixed(2)}</span>
+                            <span className="text-[10px] text-[#8C8279] font-mono line-through">$190.00 val</span>
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={() => {
+                            const matchingService = services.find(s => s.name.includes("Creator Customized"));
+                            if (matchingService) {
+                              setSelectedServices([matchingService]);
+                            } else {
+                              setSelectedServices([{
+                                category: "Nails Bar",
+                                name: `Creator Customized Pack: ${creatorPackage?.packageName || "Midnight Velvet Spark"}`,
+                                price: creatorPackage?.packagePrice || 145.00,
+                                duration: "100 mins",
+                                desc: creatorPackage?.packageDescription || ""
+                              }]);
+                            }
+                            setWizardCategory("Nails Bar");
+                            setActiveServiceCategory("Nails Bar");
+                            setActiveTab("book");
+                          }}
+                          className={creatorBtnClass}
+                        >
+                          <span>Book Package</span>
+                          <ChevronRight className="w-3.5 h-3.5 text-[#D4AF37]" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Monthly Bulletin Board loaded dynamically from content/ folders */}
+            {monthlyContent && monthlyContent.found && (() => {
+              const bulletinHeaderClass = isMobileSim
+                ? "flex flex-col gap-2 pb-2 text-left border-b border-[#E5E0DA]"
+                : "flex flex-col sm:flex-row sm:justify-between sm:items-end justify-start items-start gap-3 border-b border-[#E5E0DA] pb-2 text-left";
+
+              const bulletinTitleClass = isMobileSim
+                ? "text-lg font-serif italic text-[#1A1A1A] mt-1"
+                : "text-xl sm:text-2xl font-serif italic text-[#1A1A1A] mt-1";
+
+              const bulletinGridClass = isMobileSim
+                ? "flex flex-col gap-4 items-stretch"
+                : isTabletSim
+                ? "grid grid-cols-12 gap-4 items-stretch"
+                : "grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch";
+
+              const bulletinAnnouncementClass = isMobileSim
+                ? "bg-white border border-[#E5E0DA] rounded-[24px] p-5 text-left shadow-xs flex flex-col justify-between"
+                : isTabletSim
+                ? "col-span-7 bg-white border border-[#E5E0DA] rounded-[20px] p-5 text-left shadow-xs flex flex-col justify-between"
+                : "md:col-span-7 bg-white border border-[#E5E0DA] rounded-[24px] p-6 text-left shadow-xs flex flex-col justify-between";
+
+              const bulletinPromoBannerClass = isMobileSim
+                ? "relative rounded-[24px] overflow-hidden border border-[#DCD5CD] min-h-[220px] shadow-xs bg-[#FAF9F6] w-full"
+                : isTabletSim
+                ? "col-span-5 relative rounded-[20px] overflow-hidden border border-[#DCD5CD] min-h-[220px] shadow-xs bg-[#FAF9F6] h-full"
+                : "md:col-span-5 relative rounded-[24px] overflow-hidden border border-[#DCD5CD] min-h-[250px] shadow-xs bg-[#FAF9F6]";
+
+              return (
+                <div className="space-y-6 pt-4 border-t border-[#E5E0DA]">
+                  <div className={bulletinHeaderClass}>
+                    <div className="max-w-md sm:max-w-lg md:max-w-2xl">
+                      <span className="sub-label">ORGANIC BULLETIN BOARD</span>
+                      <h2 className={bulletinTitleClass}>
+                        {monthlyContent.text["promo-title.txt"] || "Seasonal Salon Chronicle"}
+                      </h2>
+                      <p className="text-[11px] sm:text-xs text-[#8C8279]">Live broadcast announcements from the salon administration folder system.</p>
+                    </div>
+                    <span className="text-[9px] sm:text-[10px] bg-rose-50 text-[#1A1A1A] font-mono uppercase px-2.5 py-1 sm:px-3 sm:py-1 rounded-full border border-rose-200 font-bold tracking-wider shrink-0 w-max">
+                      {monthlyContent.text["promo-tag.txt"] || "Active Curation"}
+                    </span>
+                  </div>
+
+                  <div className={bulletinGridClass}>
+                    {/* Markdown Announcement (body/announcement.md) */}
+                    <div className={bulletinAnnouncementClass}>
+                      <div className="space-y-4">
+                        <span className="text-[9px] tracking-[0.14em] uppercase font-bold text-[#8C8279] block">DEAR RED LADY GUEST</span>
+                        <div className="text-stone-700 text-xs leading-relaxed space-y-3 prose prose-stone max-w-none">
+                          {monthlyContent.body["announcement.md"] ? (
+                            <ReactMarkdown>{monthlyContent.body["announcement.md"]}</ReactMarkdown>
+                          ) : (
+                            <p className="italic text-stone-400">Welcome to Red Lady Spa. Connect calendar seasons to view active newsletters from the staff.</p>
+                          )}
+                        </div>
+                      </div>
+
+                      {monthlyContent.body["welcome-note.md"] && (
+                        <div className="mt-6 pt-4 border-t border-[#E5E0DA] text-[11px] text-[#8C8279] italic leading-relaxed">
+                          <ReactMarkdown>{monthlyContent.body["welcome-note.md"]}</ReactMarkdown>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Promo Picture banner (pictures/promo-banner.txt) */}
+                    {monthlyContent.pictures["promo-banner.txt"] && (
+                      <div className={bulletinPromoBannerClass}>
+                        <img 
+                          src={monthlyContent.pictures["promo-banner.txt"]} 
+                          alt="Promo spotlight representation" 
+                          referrerPolicy="no-referrer"
+                          className="w-full h-full object-cover select-none"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                        <div className="absolute bottom-5 left-5 right-5 text-white text-left space-y-1 z-10 p-1">
+                          <span className="text-[8px] bg-white text-stone-900 px-2 py-0.5 rounded-full font-bold uppercase tracking-widest leading-none">Spotlight Photo</span>
+                          <p className="text-xs font-serif italic text-stone-100 font-semibold truncate">Ref: {monthlyContent.pictures["promo-banner.txt"].substring(0, 48)}...</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* Top 5 Monthly Trends (Prompt requirement!) */}
             <div className="space-y-4">
-              <div className="border-b border-[#E5E0DA] pb-2 flex justify-between items-end text-left">
+              <div className="border-b border-[#E5E0DA] pb-2 flex flex-col sm:flex-row sm:justify-between sm:items-end justify-start items-start gap-2 text-left">
                 <div>
                   <span className="sub-label">POPULAR INSPIRATION</span>
-                  <h2 className="text-2xl font-serif italic text-[#1A1A1A] mt-1">Top 5 Monthly Nail Trends</h2>
-                  <p className="text-xs text-[#8C8279]">Live studio statistics. Tap heart to up-vote a trend.</p>
+                  <h2 className="text-xl sm:text-2xl font-serif italic text-[#1A1A1A] mt-1">Top 5 Monthly Nail Trends</h2>
+                  <p className="text-[11px] sm:text-xs text-[#8C8279]">Live studio statistics. Tap heart to up-vote a trend.</p>
                 </div>
-                <span className="text-[9px] tracking-wider uppercase font-bold text-[#8C8279]">Ranked by Hearts</span>
+                <span className="text-[9px] tracking-wider uppercase font-bold text-[#8C8279] shrink-0">Ranked by Hearts</span>
               </div>
 
               {(() => {
                 const activeTrends = trends.slice(0, 5);
                 if (activeTrends.length === 0) return null;
 
-                const isMobileSim = viewport === "iphone" || viewport === "android";
+                const isMobileOrTabletSim = viewport === "iphone" || viewport === "android" || viewport === "tablet";
                 const currentTrend = activeTrends[activeTrendIndex % activeTrends.length] || activeTrends[0];
 
                 const nextTrend = () => {
-                  setActiveTrendIndex((prev) => (prev + 1) % activeTrends.length);
+                   setActiveTrendIndex((prev) => (prev + 1) % activeTrends.length);
                 };
 
                 const prevTrend = () => {
-                  setActiveTrendIndex((prev) => (prev - 1 + activeTrends.length) % activeTrends.length);
+                   setActiveTrendIndex((prev) => (prev - 1 + activeTrends.length) % activeTrends.length);
                 };
 
                 return (
                   <>
-                    {/* Grid view showing for desktop/tablet viewports, unless it's the iPhone/Android simulators */}
-                    <div className={`${isMobileSim ? "hidden" : "hidden sm:grid"} lg:grid-cols-5 sm:grid-cols-2 gap-4`}>
+                    {/* Grid view showing for desktop viewports, unless it's the iPhone/Android/Tablet simulators */}
+                    <div className={`${isMobileOrTabletSim ? "hidden" : "hidden lg:grid"} lg:grid-cols-5 gap-4`}>
                       {activeTrends.map((trend) => (
                         <div key={trend.id} className="bg-white border border-[#E5E0DA] rounded-[24px] overflow-hidden shadow-xs hover:shadow-sm transition duration-300 flex flex-col justify-between">
                           <div className="h-32 relative bg-[#F9F6F2] overflow-hidden">
@@ -2157,8 +2274,8 @@ export default function ClientPortal({ onRefreshPOSData }: ClientPortalProps) {
                       ))}
                     </div>
 
-                    {/* Elegant Sliding Page for Mobile viewports & Simulators */}
-                    <div className={`${isMobileSim ? "block" : "block sm:hidden"} w-full`}>
+                    {/* Elegant Sliding Page for Mobile/Tablet viewports & Simulators */}
+                    <div className={`${isMobileOrTabletSim ? "block" : "block lg:hidden"} w-full`}>
                       <div className="relative bg-white border border-[#E5E0DA] rounded-[24px] overflow-hidden shadow-sm p-4 flex flex-col justify-between">
                         {/* Slide image container with float navigation */}
                         <div className="h-44 relative bg-[#F9F6F2] rounded-2xl overflow-hidden mb-4">
@@ -2249,6 +2366,7 @@ export default function ClientPortal({ onRefreshPOSData }: ClientPortalProps) {
             </div>
           </div>
         );
+        }
     }
   };
 
