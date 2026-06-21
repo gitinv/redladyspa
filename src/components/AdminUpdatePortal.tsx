@@ -29,6 +29,16 @@ interface ContentNode {
 }
 
 export default function AdminUpdatePortal() {
+  // Theme state
+  const [theme, setTheme] = useState<"light" | "dark">(() => {
+    try {
+      return (localStorage.getItem("admin-theme") as "light" | "dark") || "light";
+    } catch {
+      return "light";
+    }
+  });
+  const isDark = theme === "dark";
+
   // Tree state
   const [tree, setTree] = useState<ContentNode | null>(null);
   const [loadingTree, setLoadingTree] = useState(false);
@@ -291,8 +301,8 @@ export default function AdminUpdatePortal() {
           }}
           className={`group flex items-center justify-between py-1.5 px-3 rounded-lg text-xs cursor-pointer transition duration-150 ${
             isSelected 
-              ? "bg-[#1A1A1A] text-white font-medium" 
-              : "text-stone-700 hover:bg-stone-100"
+              ? (isDark ? "bg-amber-600/30 text-amber-300 border border-amber-700/50 font-medium" : "bg-[#1A1A1A] text-white font-medium") 
+              : (isDark ? "text-stone-300 hover:bg-stone-900/60" : "text-stone-700 hover:bg-stone-100")
           }`}
           style={{ paddingLeft: `${Math.max(12, depth * 16)}px` }}
         >
@@ -302,7 +312,7 @@ export default function AdminUpdatePortal() {
                 ▶
               </span>
             )}
-            <NodeIcon className={`w-3.5 h-3.5 shrink-0 ${isDir ? "text-stone-500" : folderBadgeColor}`} />
+            <NodeIcon className={`w-3.5 h-3.5 shrink-0 ${isDir ? (isDark ? "text-stone-400" : "text-stone-500") : folderBadgeColor}`} />
             <span className="truncate">{node.name}</span>
             {!isDir && node.size !== undefined && (
               <span className="text-[9px] text-stone-400 font-mono scale-90">({node.size}B)</span>
@@ -319,7 +329,11 @@ export default function AdminUpdatePortal() {
                   const parts = node.path.split("/");
                   handleDeleteMonth(parts[1], parts[2]);
                 }}
-                className="p-1 text-stone-400 hover:text-red-500 rounded bg-white shadow-xs hover:bg-red-50"
+                className={`p-1 rounded shadow-xs transition ${
+                  isDark 
+                    ? "bg-stone-900 text-stone-400 hover:text-rose-400 hover:bg-rose-950/30" 
+                    : "bg-white text-stone-400 hover:text-red-500 hover:bg-red-50"
+                }`}
               >
                 <Trash2 className="w-3 h-3" />
               </button>
@@ -331,7 +345,11 @@ export default function AdminUpdatePortal() {
                   e.stopPropagation();
                   handleDeleteFile(node.path);
                 }}
-                className="p-1 text-stone-400 hover:text-red-500 rounded bg-white shadow-xs hover:bg-red-50"
+                className={`p-1 rounded shadow-xs transition ${
+                  isDark 
+                    ? "bg-stone-900 text-stone-400 hover:text-rose-400 hover:bg-rose-950/30" 
+                    : "bg-white text-stone-400 hover:text-red-500 hover:bg-red-50"
+                }`}
               >
                 <Trash2 className="w-3 h-3" />
               </button>
@@ -362,28 +380,74 @@ export default function AdminUpdatePortal() {
   };
 
   return (
-    <div className="bg-[#FAF9F6] border border-stone-200 rounded-[28px] overflow-hidden shadow-xs grid grid-cols-1 lg:grid-cols-12 min-h-[750px] text-stone-800 font-sans">
+    <div className={`border rounded-[28px] overflow-hidden shadow-xs grid grid-cols-1 lg:grid-cols-12 min-h-[750px] font-sans transition-colors duration-200 ${
+      isDark 
+        ? "bg-stone-950 border-stone-800 text-stone-100" 
+        : "bg-[#FAF9F6] border-stone-200 text-stone-800"
+    }`}>
       
       {/* LEFT COLUMN: FOLDER STRUCTURE EXPLORER & EDITOR (7/12 cols) */}
-      <div className="lg:col-span-6 border-r border-stone-200 p-5 flex flex-col justify-between space-y-6">
+      <div className={`lg:col-span-6 p-5 flex flex-col justify-between space-y-6 transition-colors duration-200 ${
+        isDark ? "border-stone-850 lg:border-r" : "border-stone-200 lg:border-r"
+      }`}>
         
         {/* Header Branding */}
-        <div className="space-y-1">
-          <div className="flex items-center gap-1.5 text-amber-800">
-            <Sparkles className="w-4 h-4" />
-            <span className="text-[10px] tracking-widest font-bold font-mono uppercase bg-amber-50 text-amber-800 px-2 py-0.5 rounded-md">DEPLOYMENT CENTER</span>
+        <div className="space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-1 text-left">
+              <div className="flex items-center gap-1.5 text-amber-850">
+                <Sparkles className={`w-4 h-4 ${isDark ? "text-amber-400" : "text-amber-850"}`} />
+                <span className={`text-[10px] tracking-widest font-bold font-mono uppercase px-2 py-0.5 rounded-md transition-colors ${
+                  isDark ? "bg-amber-950/40 text-amber-400 border border-amber-900/40" : "bg-amber-50 text-amber-800"
+                }`}>DEPLOYMENT CENTER</span>
+              </div>
+              <h2 className={`text-xl font-bold font-display tracking-tight transition-colors ${isDark ? "text-stone-100" : "text-stone-800"}`}>Admin Content Update Portal</h2>
+            </div>
+            
+            {/* Elegant Selectable Dark/Light Theme Switcher */}
+            <div className={`flex items-center border rounded-lg p-0.5 transition-colors duration-200 shrink-0 ${
+              isDark ? "bg-stone-900 border-stone-805" : "bg-stone-100 border-stone-200"
+            }`}>
+              <button
+                onClick={() => {
+                  setTheme("light");
+                  localStorage.setItem("admin-theme", "light");
+                }}
+                className={`px-2.5 py-1 rounded-md text-[10px] font-bold font-mono uppercase tracking-wider transition-all duration-150 flex items-center gap-1 cursor-pointer select-none ${
+                  !isDark 
+                    ? "bg-white text-stone-900 shadow-xs" 
+                    : "text-stone-400 hover:text-stone-200"
+                }`}
+              >
+                Light
+              </button>
+              <button
+                onClick={() => {
+                  setTheme("dark");
+                  localStorage.setItem("admin-theme", "dark");
+                }}
+                className={`px-2.5 py-1 rounded-md text-[10px] font-bold font-mono uppercase tracking-wider transition-all duration-150 flex items-center gap-1 cursor-pointer select-none ${
+                  isDark 
+                    ? "bg-amber-600 text-stone-950 shadow-xs" 
+                    : "text-stone-505 hover:text-stone-800"
+                }`}
+              >
+                Dark
+              </button>
+            </div>
           </div>
-          <h2 className="text-xl font-bold font-display tracking-tight text-stone-800">Admin Content Update Portal</h2>
-          <p className="text-xs text-stone-500">
+          <p className={`text-xs text-left transition-colors ${isDark ? "text-stone-400" : "text-stone-500"}`}>
             Write static files on disk dynamically. Change titles, copy references, and load monthly body markdown parameters instantly across the entire spa stack.
           </p>
         </div>
 
         {/* Dynamic Bootstrap Box */}
-        <div className="bg-stone-50 border border-stone-200 rounded-2xl p-4 space-y-3">
-          <div className="flex items-center gap-1.5 text-stone-700">
-            <Plus className="w-4 h-4 text-amber-600" />
-            <span className="text-[11px] font-bold font-mono uppercase tracking-wider">Initialize New Monthly Content Folder</span>
+        <div className={`border rounded-2xl p-4 space-y-3 transition-colors duration-200 ${
+          isDark ? "bg-stone-900/40 border-stone-800" : "bg-stone-50 border-stone-200"
+        }`}>
+          <div className="flex items-center gap-1.5 text-stone-300">
+            <Plus className="w-4 h-4 text-amber-500" />
+            <span className={`text-[11px] font-bold font-mono uppercase tracking-wider transition-colors ${isDark ? "text-stone-200" : "text-stone-700"}`}>Initialize New Monthly Content Folder</span>
           </div>
           <form onSubmit={handleBootstrapMonth} className="flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-1.5">
@@ -394,7 +458,11 @@ export default function AdminUpdatePortal() {
                 max="2035" 
                 value={newYear} 
                 onChange={(e) => setNewYear(e.target.value)}
-                className="w-16 px-2.5 py-1 text-xs font-mono font-bold bg-white text-stone-800 rounded-md border border-stone-250 focus:outline-none focus:border-stone-400 text-center" 
+                className={`w-16 px-2.5 py-1 text-xs font-mono font-bold rounded-md focus:outline-none focus:ring-1 focus:ring-amber-500 text-center transition ${
+                  isDark 
+                    ? "bg-stone-950 text-white border-stone-800 focus:border-amber-500" 
+                    : "bg-white text-stone-800 border-stone-250 focus:border-stone-400"
+                }`} 
               />
             </div>
             <div className="flex items-center gap-1.5">
@@ -402,24 +470,38 @@ export default function AdminUpdatePortal() {
               <select 
                 value={newMonth} 
                 onChange={(e) => setNewMonth(e.target.value)}
-                className="w-24 px-2.5 py-1 text-xs bg-white text-stone-800 rounded-md border border-stone-250 focus:outline-none focus:border-stone-400 font-mono font-bold"
+                className={`w-24 px-2.5 py-1 text-xs rounded-md focus:outline-none focus:ring-1 focus:ring-amber-500 font-mono font-bold transition ${
+                  isDark 
+                    ? "bg-stone-950 text-white border-stone-800 focus:border-amber-500" 
+                    : "bg-white text-stone-800 border-stone-250 focus:border-stone-400"
+                }`}
               >
                 {Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, "0")).map(m => (
-                  <option key={m} value={m}>{m} ({new Date(2026, parseInt(m) - 1).toLocaleString('default', { month: 'short' })})</option>
+                  <option key={m} value={m} className={isDark ? "bg-stone-950 text-stone-100" : "bg-white text-stone-800"}>
+                    {m} ({new Date(2026, parseInt(m) - 1).toLocaleString("default", { month: "short" })})
+                  </option>
                 ))}
               </select>
             </div>
             <button 
               type="submit"
               disabled={creatingMonth}
-              className="bg-[#1A1A1A] text-stone-100 hover:bg-stone-800 disabled:opacity-40 select-none cursor-pointer rounded-md font-mono text-[10px] font-bold uppercase tracking-wider px-3.5 py-1.5 shadow-xs flex items-center gap-1 shrink-0 ml-auto transition"
+              className={`disabled:opacity-40 select-none cursor-pointer rounded-md font-mono text-[10px] font-bold uppercase tracking-wider px-3.5 py-1.5 shadow-xs flex items-center gap-1 shrink-0 ml-auto transition-all ${
+                isDark 
+                  ? "bg-amber-600 text-stone-950 hover:bg-amber-500" 
+                  : "bg-[#1A1A1A] text-stone-100 hover:bg-stone-800"
+              }`}
             >
               {creatingMonth ? "Generating..." : "Generate Month"}
             </button>
           </form>
           {monthSuccess && (
-            <div className="text-[10px] text-emerald-700 font-mono bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+            <div className={`text-[10px] font-mono px-3 py-1.5 rounded-lg flex items-center gap-1.5 border transition ${
+              isDark 
+                ? "text-emerald-400 bg-emerald-950/20 border-emerald-900/40" 
+                : "text-emerald-700 bg-emerald-50 border border-emerald-200"
+            }`}>
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
               <span>{monthSuccess}</span>
             </div>
           )}
@@ -429,14 +511,20 @@ export default function AdminUpdatePortal() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 flex-1">
           
           {/* Sub-Col 1: Recursive Folder Tree Navigation */}
-          <div className="md:col-span-5 bg-white border border-stone-200 rounded-2xl p-3 max-h-[360px] overflow-y-auto scrollbar-thin flex flex-col justify-between">
+          <div className={`md:col-span-12 lg:col-span-5 border rounded-2xl p-3 max-h-[360px] overflow-y-auto scrollbar-thin flex flex-col justify-between transition-colors duration-150 ${
+            isDark ? "bg-stone-950 border-stone-800" : "bg-white border-stone-200"
+          }`}>
             <div>
-              <div className="flex items-center justify-between border-b border-stone-100 pb-2 mb-2">
+              <div className={`flex items-center justify-between border-b pb-2 mb-2 ${isDark ? "border-stone-900" : "border-stone-100"}`}>
                 <span className="text-[10px] font-bold font-mono text-stone-400 uppercase tracking-widest">FILESYSTEM TREE</span>
                 <button 
                   onClick={loadTree} 
                   disabled={loadingTree}
-                  className="p-1 rounded hover:bg-stone-150 transition text-stone-400 hover:text-stone-700 select-none cursor-pointer"
+                  className={`p-1 rounded transition select-none cursor-pointer ${
+                    isDark 
+                      ? "text-stone-500 hover:text-stone-200 hover:bg-stone-900" 
+                      : "text-stone-400 hover:text-stone-700 hover:bg-stone-150"
+                  }`}
                   title="Reload Directory structure"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${loadingTree ? "animate-spin" : ""}`} />
@@ -456,7 +544,9 @@ export default function AdminUpdatePortal() {
               )}
             </div>
 
-            <div className="border-t border-stone-100 pt-2 mt-4 flex items-center gap-1.5 text-[9.5px] text-stone-400 leading-tight">
+            <div className={`border-t pt-2 mt-4 flex items-center gap-1.5 text-[9.5px] text-stone-400 leading-tight ${
+              isDark ? "border-stone-900" : "border-stone-100"
+            }`}>
               <Info className="w-3.5 h-3.5 text-stone-400 shrink-0" />
               <p>Double click directory folders to expand nodes, click text list nodes to edit.</p>
             </div>
@@ -569,19 +659,25 @@ export default function AdminUpdatePortal() {
       </div>
 
       {/* RIGHT COLUMN: INTERACTIVE LIVE CLIENT PREVIEW SIMULATION (5/12 cols) */}
-      <div className="lg:col-span-6 bg-[#FAF9F6] p-5 flex flex-col justify-between space-y-4">
+      <div className={`lg:col-span-6 p-5 flex flex-col justify-between space-y-4 transition-colors duration-200 ${
+        isDark ? "bg-stone-950" : "bg-[#FAF9F6]"
+      }`}>
         
         {/* Preview Control Headers */}
-        <div className="flex flex-col sm:flex-row shadow-inner sm:items-center justify-between gap-3 border-b border-stone-200 pb-3">
+        <div className={`flex flex-col sm:flex-row shadow-inner sm:items-center justify-between gap-3 border-b pb-3 transition-colors ${
+          isDark ? "border-stone-900" : "border-stone-200"
+        }`}>
           <div className="text-left leading-none">
             <span className="text-[8px] uppercase tracking-[0.14em] text-stone-400 font-bold block">EXPERIENCE TESTBED</span>
-            <span className="text-sm font-bold font-display italic text-stone-850 block mt-1">Interactive Live Preview</span>
+            <span className={`text-sm font-bold font-display italic block mt-1 transition-colors ${
+              isDark ? "text-stone-100" : "text-stone-850"
+            }`}>Interactive Live Preview</span>
           </div>
 
           <div className="flex items-center gap-2">
             
             {/* Target Year/Month display coordinates selector */}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 font-mono">
               <span className="text-[9px] font-mono font-bold text-stone-400 uppercase">MONTH</span>
               <select 
                 value={previewMonth} 
@@ -589,26 +685,42 @@ export default function AdminUpdatePortal() {
                   setPreviewMonth(e.target.value);
                   loadLivePreview(previewYear, e.target.value);
                 }}
-                className="px-2 py-1 text-[11px] bg-white text-stone-700 rounded-md border border-stone-250 focus:outline-none font-mono font-bold"
+                className={`px-2 py-1 text-[11px] rounded-md focus:outline-none font-mono font-bold transition ${
+                  isDark 
+                    ? "bg-stone-900 text-stone-100 border-stone-800" 
+                    : "bg-white text-stone-700 border-stone-250"
+                }`}
               >
                 {Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, "0")).map(m => (
-                  <option key={m} value={m}>{m} ({new Date(2026, parseInt(m) - 1).toLocaleString('default', { month: 'short' })})</option>
+                  <option key={m} value={m} className={isDark ? "bg-stone-900 text-stone-150" : "bg-white text-stone-750"}>
+                    {m} ({new Date(2026, parseInt(m) - 1).toLocaleString('default', { month: 'short' })})
+                  </option>
                 ))}
               </select>
             </div>
 
             {/* Viewport simulation state toggles */}
-            <div className="flex items-center border border-stone-250 rounded-lg p-0.5 bg-white">
+            <div className={`flex items-center border rounded-lg p-0.5 transition ${
+              isDark ? "bg-stone-900 border-stone-800" : "bg-white border-stone-250"
+            }`}>
               <button
                 onClick={() => setPreviewDevice("mobile")}
-                className={`p-1 rounded cursor-pointer ${previewDevice === "mobile" ? "bg-stone-900 text-white" : "text-stone-400 hover:text-stone-700"}`}
+                className={`p-1 rounded cursor-pointer transition ${
+                  previewDevice === "mobile" 
+                    ? (isDark ? "bg-amber-600 text-stone-950 font-bold" : "bg-stone-900 text-white") 
+                    : "text-stone-400 hover:text-stone-750"
+                }`}
                 title="Simulate Mobile Device Mode"
               >
                 <Smartphone className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => setPreviewDevice("desktop")}
-                className={`p-1 rounded cursor-pointer ${previewDevice === "desktop" ? "bg-stone-900 text-white" : "text-stone-400 hover:text-stone-700"}`}
+                className={`p-1 rounded cursor-pointer transition ${
+                  previewDevice === "desktop" 
+                    ? (isDark ? "bg-amber-600 text-stone-950 font-bold" : "bg-stone-900 text-white") 
+                    : "text-stone-400 hover:text-stone-750"
+                }`}
                 title="Simulate Large SPA Viewport Mode"
               >
                 <Laptop className="w-3.5 h-3.5" />
@@ -619,7 +731,9 @@ export default function AdminUpdatePortal() {
         </div>
 
         {/* Live Rendering Simulator */}
-        <div className="flex-1 flex items-center justify-center py-4 bg-stone-100 border border-stone-200 rounded-2xl relative overflow-hidden shadow-inner">
+        <div className={`flex-1 flex items-center justify-center py-4 rounded-2xl relative overflow-hidden transition-colors ${
+          isDark ? "bg-stone-900/40 border border-stone-900/60 shadow-inner" : "bg-stone-100 border border-stone-200 shadow-inner"
+        }`}>
           <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-3xl"></div>
           
           {loadingPreview ? (
@@ -629,7 +743,9 @@ export default function AdminUpdatePortal() {
           ) : (
             
             /* Responsive simulated container wrapper */
-            <div className={`transition-all duration-300 overflow-hidden relative border border-stone-250 bg-[#F9F6F2] shadow-xl ${
+            <div className={`transition-all duration-300 overflow-hidden relative border bg-[#F9F6F2] ${
+              isDark ? "border-stone-800 shadow-[0_0_25px_rgba(0,0,0,0.45)]" : "border-stone-250 shadow-xl"
+            } ${
               previewDevice === "mobile" 
                 ? "w-[270px] h-[520px] rounded-[36px] border-[8px] border-stone-900 flex flex-col" 
                 : "w-full max-w-[450px] h-[520px] rounded-2xl flex flex-col"
@@ -772,7 +888,9 @@ export default function AdminUpdatePortal() {
         </div>
 
         {/* Live Simulator Status Bar */}
-        <div className="flex justify-between items-center bg-stone-50 border border-stone-200 rounded-xl p-3 text-[10px] text-stone-500 font-mono">
+        <div className={`flex justify-between items-center rounded-xl p-3 text-[10px] text-stone-550 font-mono transition-colors duration-200 ${
+          isDark ? "bg-stone-900/40 border border-stone-900" : "bg-stone-50 border border-stone-200"
+        }`}>
           <div className="flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0"></span>
             <span>Target Endpoint: GET /api/monthly-content</span>
